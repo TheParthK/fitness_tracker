@@ -1,7 +1,5 @@
 import 'dart:ui';
-
 import 'package:fitness_tracker/pages/track.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,41 +29,28 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 const Expanded(child: SizedBox()),
-                Container(
-                  height: devicePadding.bottom + 40,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    // color: Colors.white,
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [Colors.black, Colors.black, Colors.transparent]
+                ClipRRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 100, sigmaY: 20),
+                    child: Container(
+                      padding: EdgeInsets.only(bottom: devicePadding.bottom + 10, left: 15, right: 15, top: 15),
+                      // height: devicePadding.bottom + 40,
+                      alignment: Alignment.center,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(20, 0, 0, 0),
+                        // color: Color.fromARGB(255, 0, 0, 0),
+                        border: Border(top: BorderSide(color: Color.fromARGB(64, 255, 255, 255), width: 0.5))
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.list_alt_outlined),
+                          Icon(Icons.pie_chart_outline, color: Color.fromARGB(255, 149, 255, 0),),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        width: 25,
-                        height: 25,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/2048px-Google_Bard_logo.svg.png'),
-                            fit: BoxFit.contain,
-                          )
-                        ),
-                      ),
-                      Container(
-                        width: 25,
-                        height: 25,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage('https://gstatic.com/images/branding/product/1x/gfit_512dp.png'),
-                            fit: BoxFit.contain,
-                          )
-                        ),
-                      ),
-                    ],
                   ),
                 )
               ],

@@ -1,7 +1,9 @@
 import 'package:circular_chart_flutter/circular_chart_flutter.dart';
 import 'package:fitness_tracker/models/models.dart';
 import 'package:fitness_tracker/widgets/list_item.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TrackPage extends StatelessWidget {
   const TrackPage({super.key});
@@ -24,27 +26,85 @@ class TrackPage extends StatelessWidget {
     CustomListModel(item: 'Carbonated Drink', cal: 115),
   ];
 
+  void _showTimePicker(context){
+    // showTimePicker(
+    //   context: context,
+    //   initialTime: TimeOfDay.now()
+    // );
+    showCupertinoModalPopup(
+    context: context,
+    builder: (BuildContext builder) {
+      return Container(
+        height: MediaQuery.of(context).copyWith().size.height * 0.25,
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 22, 22, 22),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(10))
+        ),
+        child: CupertinoDatePicker(
+          mode: CupertinoDatePickerMode.dateAndTime,
+          onDateTimeChanged: (value) {
+
+          },
+          initialDateTime: DateTime.now(),
+        ),
+      );
+    });
+  }
   void _showBottomDialogBox(context){
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: const BoxDecoration(
             color: Color.fromARGB(255, 22, 22, 22),
             borderRadius: BorderRadius.vertical(top: Radius.circular(10))
           ),
           width: double.infinity,
           child: Column(
-            children: const [
-              Text(
-                'Add Food Item',
+            children: [
+              const Text(
+                'Add a meal',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold
                 ),
+              ),
+              const SizedBox(height: 20,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Time',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  Material(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    child: InkWell(
+                      onTap: ()=> _showTimePicker(context),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          // color: Color.fromARGB(255, 35, 35, 35),
+                          borderRadius: BorderRadius.all(Radius.circular(10))
+                        ),
+                        child: const Text(
+                          'Pick Time',
+                          style: TextStyle(
+                            color: Colors.white
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               )
             ],
           ),
@@ -74,13 +134,13 @@ class TrackPage extends StatelessWidget {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: const[
                         Text(
                           'THURSDAY, 28 SEP',
                           style: TextStyle(
-                            color: Color.fromARGB(141, 255, 255, 255),
+                            color: Color.fromARGB(255, 149, 255, 0),
                             fontWeight: FontWeight.w600,
-                            fontSize: 12
+                            fontSize: 12,
                           ),
                         ),
                         Text(
@@ -89,18 +149,22 @@ class TrackPage extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            fontFamily: 'Futura'
                           ),
                         ),
                       ],
                     ),
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
                       decoration: const BoxDecoration(
                         // color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                         image: DecorationImage(
-                          image: NetworkImage('https://ichef.bbci.co.uk/images/ic/704xn/p02hdy14.jpg'),
+                          // image: NetworkImage('https://ichef.bbci.co.uk/images/ic/704xn/p02hdy14.jpg'),
+                          image: AssetImage('assets/logo_w.png'),
                           fit: BoxFit.cover
                         )
                       ),
@@ -127,13 +191,15 @@ class TrackPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               RichText(
-                                text: const TextSpan(
+                                text:  const TextSpan(
                                   style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 50
+                                  fontSize: 50,
+                                  fontStyle: FontStyle.italic,
+                                  fontFamily: 'Futura'
                                 ),
-                                  children: [
+                                  children:  [
                                     TextSpan(text: '1125'),
                                     // TextSpan(
                                     //   text: '/1250',
@@ -148,9 +214,9 @@ class TrackPage extends StatelessWidget {
                               const Text(
                                 'cal',
                                 style: TextStyle( 
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 17
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15
                                 ),
                               ),
                             ],
@@ -164,8 +230,10 @@ class TrackPage extends StatelessWidget {
                       initialChartData: const [
                         CircularStackEntry(
                           [
-                            CircularSegmentEntry(80, Color(0xFF69f0ae)),
-                            CircularSegmentEntry(100, Color.fromARGB(134, 39, 103, 123)),
+                            // CircularSegmentEntry(65, Color(0xFF69f0ae)),
+                            // CircularSegmentEntry(100, Color.fromARGB(134, 39, 103, 123)),
+                            CircularSegmentEntry(65, Color.fromARGB(255, 149, 255, 0)),
+                            CircularSegmentEntry(100,Color.fromARGB(156, 62, 124, 0)),
                           ]
                         ),
                       ],
@@ -276,23 +344,25 @@ class TrackPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      ' Today',
+                      ' Meals',
                       style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: ()=>_showBottomDialogBox(context),
+                    InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(16)),
+                      onTap: () => _showBottomDialogBox(context),
+                      // splashColor: Color.fromARGB(255, 149, 255, 0),
                       child: Container(
                         height: 32,
                         width: 32,
                         alignment: Alignment.center,
                         child: const Icon(
-                          Icons.add,
-                          size: 30,
-                          color: Colors.white,
+                          Icons.add_circle,
+                          size: 32,
+                          color: Color.fromARGB(255, 149, 255, 0),
                         ),
                       ),
                     )
@@ -309,10 +379,11 @@ class TrackPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ...foodInfos.map((e) => ListItemCustom(info: e))
+                    ...foodInfos.map((e) => ListItemCustom(info: e)),
                   ],
                 ),
-              )
+              ),
+              SizedBox(height: devicePadding.bottom + 80,)
             ],
         ),
       ),

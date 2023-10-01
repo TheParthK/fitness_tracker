@@ -1,7 +1,10 @@
 import 'package:fitness_tracker/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  //Setting SystmeUIMode
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
   runApp(const MyApp());
 }
 class MyApp extends StatelessWidget {
@@ -11,8 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true
+      theme: ThemeData.dark(
+        useMaterial3: true,
       ),
       home: const HomePage()
     );

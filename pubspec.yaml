@@ -89,6 +89,9 @@ flutter:
     - family: SFProB
       fonts:
         - asset: fonts/SFProB.otf
+    - family: Futura
+      fonts:
+        - asset: fonts/Futura.ttc
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

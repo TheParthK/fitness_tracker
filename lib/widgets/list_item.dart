@@ -36,9 +36,9 @@ class ListItemCustom extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Container(
-                  alignment: Alignment.center,
+                  alignment: Alignment.centerRight,
                   child: RichText(
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.right,
                     text: TextSpan(
                       style: const TextStyle(
                       color: Colors.white,
@@ -50,7 +50,8 @@ class ListItemCustom extends StatelessWidget {
                       const TextSpan(
                         text: ' Cal',
                         style: TextStyle(
-                          color: Colors.grey,
+                          // color: Colors.grey,
+                          color: Color.fromARGB(255, 149, 255, 0),
                           fontSize: 12
                           ),
                         )
