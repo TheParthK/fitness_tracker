@@ -29,6 +29,8 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 const Expanded(child: SizedBox()),
+
+                // bottom nav bar
                 ClipRRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 100, sigmaY: 20),

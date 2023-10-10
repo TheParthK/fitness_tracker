@@ -3,9 +3,8 @@ import 'package:fitness_tracker/models/models.dart';
 import 'package:fitness_tracker/widgets/list_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class TrackPage extends StatelessWidget {
+class TrackPage extends StatefulWidget {
   const TrackPage({super.key});
   static Map<String, double> datamap = {
     'Burnt' : 9,
@@ -25,12 +24,16 @@ class TrackPage extends StatelessWidget {
     CustomListModel(item: 'Chicken Tikka Masala', cal: 540),
     CustomListModel(item: 'Carbonated Drink', cal: 115),
   ];
+  @override
+  State<TrackPage> createState() => _TrackPageState();
+}
 
+class _TrackPageState extends State<TrackPage> {
+
+  List<String> daysOfTheWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  DateTime selectedDate = DateTime.now();
   void _showTimePicker(context){
-    // showTimePicker(
-    //   context: context,
-    //   initialTime: TimeOfDay.now()
-    // );
     showCupertinoModalPopup(
     context: context,
     builder: (BuildContext builder) {
@@ -43,13 +46,17 @@ class TrackPage extends StatelessWidget {
         child: CupertinoDatePicker(
           mode: CupertinoDatePickerMode.dateAndTime,
           onDateTimeChanged: (value) {
-
+            setState(() {
+              selectedDate = value;
+            });
           },
+          use24hFormat: true,
           initialDateTime: DateTime.now(),
         ),
       );
     });
   }
+
   void _showBottomDialogBox(context){
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
@@ -85,19 +92,19 @@ class TrackPage extends StatelessWidget {
                     ),
                   ),
                   Material(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     child: InkWell(
                       onTap: ()=> _showTimePicker(context),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
                           // color: Color.fromARGB(255, 35, 35, 35),
                           borderRadius: BorderRadius.all(Radius.circular(10))
                         ),
-                        child: const Text(
-                          'Pick Time',
-                          style: TextStyle(
+                        child: Text(
+                          '${daysOfTheWeek[selectedDate.weekday - 1]}, ${selectedDate.hour}:${selectedDate.minute}',
+                          style: const TextStyle(
                             color: Colors.white
                           ),
                         ),
@@ -116,7 +123,6 @@ class TrackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Padding(
@@ -125,127 +131,8 @@ class TrackPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(0),
             children: [
-              SizedBox(height: devicePadding.top + 20,),
-              Container(
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:  [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const[
-                        Text(
-                          'THURSDAY, 28 SEP',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 149, 255, 0),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          'Tracking',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            fontFamily: 'Futura'
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        // color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        image: DecorationImage(
-                          // image: NetworkImage('https://ichef.bbci.co.uk/images/ic/704xn/p02hdy14.jpg'),
-                          image: AssetImage('assets/logo_w.png'),
-                          fit: BoxFit.cover
-                        )
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20,),
-              SizedBox(
-                width: size.width/1.4,
-                height: size.width/1.4,
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Container(
-                        width: size.width/1.4 - 100,
-                        height: size.width/1.4 - 100,
-                        decoration: BoxDecoration(
-                          // color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(size.width/2.8))
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RichText(
-                                text:  const TextSpan(
-                                  style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 50,
-                                  fontStyle: FontStyle.italic,
-                                  fontFamily: 'Futura'
-                                ),
-                                  children:  [
-                                    TextSpan(text: '1125'),
-                                    // TextSpan(
-                                    //   text: '/1250',
-                                    //   style: TextStyle(
-                                    //     color: Colors.grey,
-                                    //     fontSize: 12
-                                    //   )
-                                    // )
-                                  ]
-                                )
-                              ),
-                              const Text(
-                                'cal',
-                                style: TextStyle( 
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ),
-                    ),
-                    AnimatedCircularChart(
-                      size: Size(size.width/1.4 + 160, size.width/1.4 + 160),
-                      duration: const Duration(milliseconds: 700),
-                      initialChartData: const [
-                        CircularStackEntry(
-                          [
-                            // CircularSegmentEntry(65, Color(0xFF69f0ae)),
-                            // CircularSegmentEntry(100, Color.fromARGB(134, 39, 103, 123)),
-                            CircularSegmentEntry(65, Color.fromARGB(255, 149, 255, 0)),
-                            CircularSegmentEntry(100,Color.fromARGB(156, 62, 124, 0)),
-                          ]
-                        ),
-                      ],
-                      chartType: CircularChartType.Radial,
-                      percentageValues: true,
-                      edgeStyle: SegmentEdgeStyle.round,
-                      holeRadius: size.width/1.4/2 - 80,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20,),
+              const TopBarC(),
+              const ThePieChart(),
               Container(
                 width: double.infinity,
                 height: 70,
@@ -369,6 +256,8 @@ class TrackPage extends StatelessWidget {
                   ],
                 ),
               ),
+
+
               const SizedBox(height: 10,),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -379,7 +268,7 @@ class TrackPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ...foodInfos.map((e) => ListItemCustom(info: e)),
+                    ...TrackPage.foodInfos.map((e) => ListItemCustom(info: e)),
                   ],
                 ),
               ),
@@ -392,3 +281,162 @@ class TrackPage extends StatelessWidget {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Top Bar
+class TopBarC extends StatelessWidget {
+  const TopBarC({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+  EdgeInsets devicePadding = MediaQuery.of(context).padding;
+    return Container(
+      margin: EdgeInsets.only(top: devicePadding.top + 20, bottom: 20),
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children:  [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const[
+              Text(
+                'THURSDAY, 28 SEP',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 149, 255, 0),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                'Tracking',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  fontFamily: 'Futura'
+                ),
+              ),
+            ],
+          ),
+          Container(
+            width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              // color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              image: DecorationImage(
+                // image: NetworkImage('https://ichef.bbci.co.uk/images/ic/704xn/p02hdy14.jpg'),
+                image: AssetImage('assets/logo_w.png'),
+                fit: BoxFit.cover
+              )
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+// The Pie Chart
+
+
+
+class ThePieChart extends StatelessWidget {
+  const ThePieChart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: SizedBox(
+        width: size.width/1.4,
+        height: size.width/1.4,
+        child: Stack(
+          children: [
+            Center(
+              child: Container(
+                width: size.width/1.4 - 100,
+                height: size.width/1.4 - 100,
+                decoration: BoxDecoration(
+                  // color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(size.width/2.8))
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RichText(
+                        text:  const TextSpan(
+                          style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 50,
+                          fontStyle: FontStyle.italic,
+                          fontFamily: 'Futura'
+                        ),
+                          children:  [
+                            TextSpan(text: '1125'),
+                          ]
+                        )
+                      ),
+                      const Text(
+                        'cal',
+                        style: TextStyle( 
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ),
+            ),
+            AnimatedCircularChart(
+              size: Size(size.width/1.4 + 160, size.width/1.4 + 160),
+              duration: const Duration(milliseconds: 700),
+              initialChartData: const [
+                CircularStackEntry(
+                  [
+                    CircularSegmentEntry(65, Color.fromARGB(255, 149, 255, 0)),
+                    CircularSegmentEntry(100,Color.fromARGB(156, 62, 124, 0)),
+                  ]
+                ),
+              ],
+              chartType: CircularChartType.Radial,
+              percentageValues: true,
+              edgeStyle: SegmentEdgeStyle.round,
+              holeRadius: size.width/1.4/2 - 80,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
