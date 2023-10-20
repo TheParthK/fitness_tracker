@@ -3,6 +3,7 @@ import 'package:fitness_tracker/pages/ai_planner.dart';
 import 'package:fitness_tracker/pages/track.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
 
 // ignore: must_be_immutable
 class HomePage extends StatefulWidget {
@@ -78,10 +79,10 @@ class CustomBottomNavBar extends StatelessWidget {
           // height: devicePadding.bottom + 40,
           alignment: Alignment.center,
           width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(20, 0, 0, 0),
+          decoration: BoxDecoration(
+            color: Platform.isIOS? const Color.fromARGB(20, 0, 0, 0) : Color.fromARGB(255, 25, 25, 25),
             // color: Color.fromARGB(255, 0, 0, 0),
-            border: Border(top: BorderSide(color: Color.fromARGB(64, 255, 255, 255), width: 0.5))
+            border: const Border(top: BorderSide(color: Color.fromARGB(64, 255, 255, 255), width: 0.5))
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
