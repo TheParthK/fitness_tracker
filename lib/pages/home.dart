@@ -1,11 +1,28 @@
 import 'dart:ui';
+import 'package:fitness_tracker/pages/ai_planner.dart';
 import 'package:fitness_tracker/pages/track.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class HomePage extends StatelessWidget {
+// ignore: must_be_immutable
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  int currentPage = 1;
+  void goToTrackPage(){
+    setState(() {
+      currentPage = 1;
+    });
+  }
+  void goToAIPage(){
+    setState(() {
+      currentPage = 0;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
@@ -13,10 +30,12 @@ class HomePage extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 255, 250, 250),
+        backgroundColor: Colors.black,
         body: Stack(
           children: [
-            const TrackPage(),
+            currentPage == 0 ? 
+            const AIPlannerPage()
+            : TrackPage(),
             Column(
               children: [
                 ClipRRect(
@@ -29,32 +48,8 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 const Expanded(child: SizedBox()),
-
                 // bottom nav bar
-                ClipRRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 100, sigmaY: 20),
-                    child: Container(
-                      padding: EdgeInsets.only(bottom: devicePadding.bottom + 10, left: 15, right: 15, top: 15),
-                      // height: devicePadding.bottom + 40,
-                      alignment: Alignment.center,
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Color.fromARGB(20, 0, 0, 0),
-                        // color: Color.fromARGB(255, 0, 0, 0),
-                        border: Border(top: BorderSide(color: Color.fromARGB(64, 255, 255, 255), width: 0.5))
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.list_alt_outlined),
-                          Icon(Icons.pie_chart_outline, color: Color.fromARGB(255, 149, 255, 0),),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
+                CustomBottomNavBar(currentPage: currentPage, goToTrackPage: goToTrackPage, goToAIPage: goToAIPage)
               ],
             )
           ]
@@ -64,20 +59,51 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class CustomNavBar extends StatelessWidget {
-  const CustomNavBar({super.key});
+class CustomBottomNavBar extends StatelessWidget {
+  final int currentPage;
+  final VoidCallback goToTrackPage;
+  final VoidCallback goToAIPage;
+
+  const CustomBottomNavBar({super.key, required this.currentPage, required this.goToTrackPage, required this.goToAIPage});
 
   @override
 
   Widget build(BuildContext context) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
-    return Container(
-      height: devicePadding.bottom+ 50,
-      width: double.infinity,
-      padding: EdgeInsets.only(bottom: devicePadding.bottom),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey, width: 0.8))
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 45, sigmaY: 45),
+        child: Container(
+          padding: EdgeInsets.only(bottom: devicePadding.bottom + 10, left: 15, right: 15, top: 15),
+          // height: devicePadding.bottom + 40,
+          alignment: Alignment.center,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(20, 0, 0, 0),
+            // color: Color.fromARGB(255, 0, 0, 0),
+            border: Border(top: BorderSide(color: Color.fromARGB(64, 255, 255, 255), width: 0.5))
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              InkWell(
+                onTap: goToAIPage,
+                child: Icon(
+                  Icons.list_alt_outlined,
+                  color: currentPage == 0 ?
+                    const Color.fromARGB(255, 149, 255, 0)
+                      : Colors.white,)),
+              InkWell(
+                onTap: goToTrackPage,
+                child: Icon(
+                  Icons.pie_chart_outline,
+                  color: currentPage == 1 ?
+                    const Color.fromARGB(255, 149, 255, 0)
+                      : Colors.white,)),
+            ],
+          ),
+        ),
       ),
     );
   }
