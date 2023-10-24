@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:fitness_tracker/pages/login_page.dart';
 import 'package:fitness_tracker/pages/track.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:http/http.dart' as http;
 
-class AIPlannerPage extends StatelessWidget {
+class AIPlannerPage extends StatefulWidget {
   const AIPlannerPage({super.key});
 
   static const List<String> genders = <String>['Male', 'Female', 'Delusional'];
@@ -33,38 +35,57 @@ class AIPlannerPage extends StatelessWidget {
     for(int i = 0 ; i < inputNames.length ; i++) TextEditingController()
   ];
 
+  @override
+  State<AIPlannerPage> createState() => _AIPlannerPageState();
+}
 
-  submitResponse(){
+class _AIPlannerPageState extends State<AIPlannerPage> {
+  Future submitResponse() async{
+    setState(() {
+      uploading = true;
+    });
     var url = 'http://127.0.0.1:5000/api/get-ai-response';
     var body = jsonEncode({   
       "user_info":{
-          "age" : textEditingControllers[0].text,
-          "gender" : textEditingControllers[1].text,
-          "height" : textEditingControllers[2].text,
-          "weight" : textEditingControllers[3].text,
-          "medical_history" : textEditingControllers[5].text
+          "age" : AIPlannerPage.textEditingControllers[0].text,
+          "gender" : AIPlannerPage.textEditingControllers[1].text,
+          "height" : AIPlannerPage.textEditingControllers[2].text,
+          "weight" : AIPlannerPage.textEditingControllers[3].text,
+          "medical_history" : AIPlannerPage.textEditingControllers[5].text,
+          "fitness_goals" : AIPlannerPage.textEditingControllers[4].text
       },
       "diet_pref" : {
-          "pref" : textEditingControllers[7].text,
-          "allergies" : textEditingControllers[8].text
+          "pref" : AIPlannerPage.textEditingControllers[7].text,
+          "allergies" : AIPlannerPage.textEditingControllers[8].text
       },
       "workout_pref" : {
-          "level" : textEditingControllers[9].text,
-          "freq" : textEditingControllers[10].text,
-          "duration" : textEditingControllers[11].text,
-          "type" : textEditingControllers[12].text,
-          "equipment_availability" : textEditingControllers[13].text,
-          "intensity" : textEditingControllers[14].text
+          "level" : AIPlannerPage.textEditingControllers[9].text,
+          "freq" : AIPlannerPage.textEditingControllers[10].text,
+          "duration" : AIPlannerPage.textEditingControllers[11].text,
+          "type" : AIPlannerPage.textEditingControllers[12].text,
+          "equipment_availability" : AIPlannerPage.textEditingControllers[13].text,
+          "intensity" : AIPlannerPage.textEditingControllers[14].text
       }
   });
   http.post(
     Uri.parse(url),
     body: body
   ).then((value){
+    setState(() {
+      gotResponse = true;
+      uploading = false;
+    });
     print(value.statusCode);
     print(value.body);
+    setState(() {
+      content = jsonDecode(value.body)['message'];
+    });
   });
   }
+
+  bool uploading = false;
+  bool gotResponse = false;
+  String? content;
 
   @override
   Widget build(BuildContext context) {
@@ -78,30 +99,53 @@ class AIPlannerPage extends StatelessWidget {
         builder: (context, value, child) => 
           Opacity(
             opacity: value.toDouble(),
-            child: Container(
+            child: 
+            Container(
               color: Colors.black,
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                 children: [ 
                   const TopBarC(title: 'AI Planner',),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      'Personal Information',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold
+                  !uploading && !gotResponse?
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            'Personal Information',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                        ...AIPlannerPage.inputNames.map((e) => CustomInputField(title: e, widget: CustomInputFieldChildTextInput(controller: AIPlannerPage.textEditingControllers[AIPlannerPage.inputNames.indexOf(e)],)),),
+                        const SizedBox(height: 10,),
+                        CustomButton(text: ' Continue ', function: () => submitResponse()),
+                      ],
+                    ): uploading && !gotResponse ? 
+                    Center(
+                      child: Container(
+                        width: 75,
+                        height: 75,
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 30, 30, 30),
+                          borderRadius: BorderRadius.all(Radius.circular(20))
+                        ),
+                        child: CupertinoActivityIndicator(color: Colors.white,),
                       ),
-                    ),
-                  ),
-                  ...inputNames.map((e) => CustomInputField(title: e, widget: CustomInputFieldChildTextInput(controller: textEditingControllers[inputNames.indexOf(e)],)),),
-                  SizedBox(height: 10,),
-                  CustomButton(text: ' Continue ', function: () => submitResponse()),
-                  const SizedBox(height: 100,),
+                    ) : Markdown(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      data: content!
+                      ),
+                    const SizedBox(height: 200,),
                 ],
               ),
-            ),
+            ) 
           ),
       ),
     );
