@@ -28,7 +28,8 @@ class AIPlannerPage extends StatefulWidget {
     'Workout Duration', //11
     'Workout Type', // 12
     'Equipment Availability',
-    'Intensity'
+    'Intensity',
+    'Activity Level'
   ];
 
   static List<TextEditingController> textEditingControllers = [
@@ -52,7 +53,8 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
           "height" : AIPlannerPage.textEditingControllers[2].text,
           "weight" : AIPlannerPage.textEditingControllers[3].text,
           "medical_history" : AIPlannerPage.textEditingControllers[5].text,
-          "fitness_goals" : AIPlannerPage.textEditingControllers[4].text
+          "fitness_goals" : AIPlannerPage.textEditingControllers[4].text,
+          "activity_level" : AIPlannerPage.textEditingControllers[15].text
       },
       "diet_pref" : {
           "pref" : AIPlannerPage.textEditingControllers[7].text,
