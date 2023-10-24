@@ -1,11 +1,70 @@
+import 'dart:convert';
+
+import 'package:fitness_tracker/pages/login_page.dart';
 import 'package:fitness_tracker/pages/track.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
+import 'package:http/http.dart' as http;
 
 class AIPlannerPage extends StatelessWidget {
   const AIPlannerPage({super.key});
 
   static const List<String> genders = <String>['Male', 'Female', 'Delusional'];
+
+  static List<String> inputNames = [
+    'Age',
+    'Gender',
+    'Height',
+    'Weight', //3
+    'Fitness Goals',  // 4
+    'Medical History', ///5
+    'Workout Preferences', //6
+    'Diet Preferences', //7
+    'Allergies', //8
+    'Workout Level', //9
+    'Workout Frequency', //10
+    'Workout Duration', //11
+    'Workout Type', // 12
+    'Equipment Availability',
+    'Intensity'
+  ];
+
+  static List<TextEditingController> textEditingControllers = [
+    for(int i = 0 ; i < inputNames.length ; i++) TextEditingController()
+  ];
+
+
+  submitResponse(){
+    var url = 'http://127.0.0.1:5000/api/get-ai-response';
+    var body = jsonEncode({   
+      "user_info":{
+          "age" : textEditingControllers[0].text,
+          "gender" : textEditingControllers[1].text,
+          "height" : textEditingControllers[2].text,
+          "weight" : textEditingControllers[3].text,
+          "medical_history" : textEditingControllers[5].text
+      },
+      "diet_pref" : {
+          "pref" : textEditingControllers[7].text,
+          "allergies" : textEditingControllers[8].text
+      },
+      "workout_pref" : {
+          "level" : textEditingControllers[9].text,
+          "freq" : textEditingControllers[10].text,
+          "duration" : textEditingControllers[11].text,
+          "type" : textEditingControllers[12].text,
+          "equipment_availability" : textEditingControllers[13].text,
+          "intensity" : textEditingControllers[14].text
+      }
+  });
+  http.post(
+    Uri.parse(url),
+    body: body
+  ).then((value){
+    print(value.statusCode);
+    print(value.body);
+  });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +72,7 @@ class AIPlannerPage extends StatelessWidget {
       backgroundColor: Colors.black,
       body: PlayAnimationBuilder(
         tween: Tween(begin: 0.01, end: 1),
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 500),
         fps: 60,
         curve: Curves.fastLinearToSlowEaseIn,
         builder: (context, value, child) => 
@@ -23,9 +82,9 @@ class AIPlannerPage extends StatelessWidget {
               color: Colors.black,
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                children: const [ 
-                  TopBarC(title: 'AI Planner',),
-                  Padding(
+                children: [ 
+                  const TopBarC(title: 'AI Planner',),
+                  const Padding(
                     padding: EdgeInsets.only(bottom: 12),
                     child: Text(
                       'Personal Information',
@@ -36,17 +95,10 @@ class AIPlannerPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  CustomInputField(title: 'Age', widget: CustomInputFieldChildTextInput()),
-                  // CustomInputField(title: 'Gender', widget: CustomDropdownInput(itemList: genders)),
-                  CustomInputField(title: 'Gender', widget: CustomInputFieldChildTextInput()),
-                  CustomInputField(title: 'Height', widget: CustomInputFieldChildTextInput()),
-                  CustomInputField(title: 'Weight', widget: CustomInputFieldChildTextInput()),
-                  CustomInputField(title: 'Fitness Goals', widget: CustomInputFieldChildTextInput()),
-                  CustomInputField(title: 'Medical History', widget: CustomInputFieldChildTextInput()),
-                  CustomInputField(title: 'Workout Preferences', widget: CustomInputFieldChildTextInput()),
-                  CustomInputField(title: 'Allergies', widget: CustomInputFieldChildTextInput()),
-                  
-                  SizedBox(height: 100,)
+                  ...inputNames.map((e) => CustomInputField(title: e, widget: CustomInputFieldChildTextInput(controller: textEditingControllers[inputNames.indexOf(e)],)),),
+                  SizedBox(height: 10,),
+                  CustomButton(text: ' Continue ', function: () => submitResponse()),
+                  const SizedBox(height: 100,),
                 ],
               ),
             ),
@@ -92,7 +144,8 @@ class CustomInputField extends StatelessWidget {
 }
 
 class CustomInputFieldChildTextInput extends StatelessWidget {
-  const CustomInputFieldChildTextInput ({super.key});
+  final TextEditingController controller;
+  const CustomInputFieldChildTextInput ({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

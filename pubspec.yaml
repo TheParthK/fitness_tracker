@@ -41,6 +41,7 @@ dependencies:
   fl_chart: ^0.62.0
   lottie: ^2.3.2
   simple_animations: ^5.0.2
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:

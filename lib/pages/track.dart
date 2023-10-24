@@ -19,7 +19,7 @@ class TrackPage extends StatefulWidget {
 class _TrackPageState extends State<TrackPage> {
 // bottom modal sheet
   List<CustomListModel> foodInfos = [
-    CustomListModel(item: 'Butter Chicken', cal: 650),
+    CustomListModel(item: 'Burrito', cal: 650),
     CustomListModel(item: 'Omlette', cal: 59),
     CustomListModel(item: 'Boiled Eggs', cal: 24),
     CustomListModel(item: 'Noodles', cal: 84),

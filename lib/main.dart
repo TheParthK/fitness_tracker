@@ -1,4 +1,5 @@
 import 'package:fitness_tracker/pages/home.dart';
+import 'package:fitness_tracker/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: HomePage()
+      // home: LoginPage()
     );
   }
 }
