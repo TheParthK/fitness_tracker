@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int currentPage = 0;
+  int currentPage = 1;
   void goToTrackPage(){
     setState(() {
       currentPage = 1;

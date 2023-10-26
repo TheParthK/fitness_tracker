@@ -1,9 +1,11 @@
 import 'package:circular_chart_flutter/circular_chart_flutter.dart';
 import 'package:fitness_tracker/models/models.dart';
 import 'package:fitness_tracker/widgets/list_item.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
+import 'package:collection/collection.dart';
 
 class TrackPage extends StatefulWidget {
   TrackPage({super.key});
@@ -18,6 +20,9 @@ class TrackPage extends StatefulWidget {
 
 class _TrackPageState extends State<TrackPage> {
 // bottom modal sheet
+
+  double totalCals = 4500;
+
   List<CustomListModel> foodInfos = [
     CustomListModel(item: 'Burrito', cal: 650),
     CustomListModel(item: 'Omlette', cal: 59),
@@ -33,6 +38,7 @@ class _TrackPageState extends State<TrackPage> {
     CustomListModel(item: 'Carbonated Drink', cal: 115),
   ];
   DateTime selectedDate = DateTime.now();
+
 
   _addItemToFoodInfos(CustomListModel food){
     setState(() {
@@ -258,7 +264,7 @@ class _TrackPageState extends State<TrackPage> {
               padding: const EdgeInsets.all(0),
                 children: [
                   const TopBarC(title: 'Tracking',),
-                  const ThePieChart(),
+                  ThePieChart(totalCals: totalCals, consumedCals: foodInfos.map((e) => e.cal).toList().sum.toDouble()),
                   Container(
                     width: double.infinity,
                     height: 70,
@@ -409,25 +415,6 @@ class _TrackPageState extends State<TrackPage> {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Top Bar
 class TopBarC extends StatelessWidget {
   final String title;
@@ -493,12 +480,35 @@ class TopBarC extends StatelessWidget {
 
 
 
-class ThePieChart extends StatelessWidget {
-  const ThePieChart({super.key});
+class ThePieChart extends StatefulWidget {
+  final double totalCals;
+  final double consumedCals;
+  ThePieChart({super.key, required this.totalCals, required this.consumedCals});
 
+  GlobalKey<AnimatedCircularChartState> _chartKey = new GlobalKey<AnimatedCircularChartState>();
+
+  @override
+  State<ThePieChart> createState() => _ThePieChartState();
+}
+
+class _ThePieChartState extends State<ThePieChart> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    print(widget.consumedCals);
+    setState(() {
+      widget._chartKey.currentState?.updateData(
+          [
+            CircularStackEntry(
+              [
+                CircularSegmentEntry(widget.consumedCals / widget.totalCals * 100, const Color.fromARGB(255, 149, 255, 0), rankKey: ''),
+                const CircularSegmentEntry(100,Color.fromARGB(156, 62, 124, 0)),
+              ]
+            ),
+          ]
+      );
+    });
+    final ccals  = ValueNotifier<double> (widget.consumedCals);
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: SizedBox(
@@ -519,8 +529,8 @@ class ThePieChart extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       RichText(
-                        text:  const TextSpan(
-                          style: TextStyle(
+                        text:  TextSpan(
+                          style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 50,
@@ -528,7 +538,7 @@ class ThePieChart extends StatelessWidget {
                           fontFamily: 'Futura'
                         ),
                           children:  [
-                            TextSpan(text: '1125'),
+                            TextSpan(text: widget.consumedCals.toInt().toString()),
                           ]
                         )
                       ),
@@ -546,13 +556,14 @@ class ThePieChart extends StatelessWidget {
               ),
             ),
             AnimatedCircularChart(
+              key: widget._chartKey,
               size: Size(size.width/1.4 + 160, size.width/1.4 + 160),
               duration: const Duration(milliseconds: 700),
-              initialChartData: const [
+              initialChartData: [
                 CircularStackEntry(
                   [
-                    CircularSegmentEntry(65, Color.fromARGB(255, 149, 255, 0)),
-                    CircularSegmentEntry(100,Color.fromARGB(156, 62, 124, 0)),
+                    CircularSegmentEntry(widget.consumedCals / widget.totalCals * 100, const Color.fromARGB(255, 149, 255, 0), rankKey: ''),
+                    const CircularSegmentEntry(100,Color.fromARGB(156, 62, 124, 0)),
                   ]
                 ),
               ],
@@ -560,14 +571,13 @@ class ThePieChart extends StatelessWidget {
               percentageValues: true,
               edgeStyle: SegmentEdgeStyle.round,
               holeRadius: size.width/1.4/2 - 80,
-            ),
+              ),
           ],
         ),
       ),
     );
   }
 }
-
 
 class SubmitCancelButton extends StatelessWidget {
   final IconData icon;
