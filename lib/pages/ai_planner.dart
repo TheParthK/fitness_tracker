@@ -71,6 +71,7 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
   });
   http.post(
     Uri.parse(url),
+    headers: {"Content-Type": "application/json"},
     body: body
   ).then((value){
     setState(() {
