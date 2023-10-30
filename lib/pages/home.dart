@@ -35,8 +35,13 @@ class _HomePageState extends State<HomePage> {
         body: Stack(
           children: [
             currentPage == 0 ? 
-            const AIPlannerPage()
-            : TrackPage(),
+            PageStorage(
+              bucket: PageStorageBucket(),
+              child: const AIPlannerPage()
+              )
+            : PageStorage(
+              bucket: PageStorageBucket(),
+              child: TrackPage()),
             Column(
               children: [
                 ClipRRect(
@@ -80,7 +85,7 @@ class CustomBottomNavBar extends StatelessWidget {
           alignment: Alignment.center,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Platform.isIOS? const Color.fromARGB(20, 0, 0, 0) : Color.fromARGB(255, 25, 25, 25),
+            color: Platform.isIOS? const Color.fromARGB(20, 0, 0, 0) : Colors.black,
             // color: Color.fromARGB(255, 0, 0, 0),
             border: const Border(top: BorderSide(color: Color.fromARGB(64, 255, 255, 255), width: 0.5))
           ),
@@ -88,14 +93,15 @@ class CustomBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              InkWell(
+              GestureDetector(
                 onTap: goToAIPage,
                 child: Icon(
                   Icons.list_alt_outlined,
                   color: currentPage == 0 ?
                     const Color.fromARGB(255, 149, 255, 0)
                       : Colors.white,)),
-              InkWell(
+
+              GestureDetector(
                 onTap: goToTrackPage,
                 child: Icon(
                   Icons.pie_chart_outline,

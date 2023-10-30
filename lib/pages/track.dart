@@ -150,7 +150,7 @@ class _TrackPageState extends State<TrackPage> {
                               }
                             );
                           },
-                          child: Text('${daysOfTheWeek[selectedDate.weekday]} ${selectedDate.day} ${monthsOfTheYear[selectedDate.month - 1]}')
+                          child: Text('${daysOfTheWeek[selectedDate.weekday - 1]} ${selectedDate.day} ${monthsOfTheYear[selectedDate.month - 1]}')
                         ),
                         const SizedBox(width: 10,),
                         Expanded(
@@ -419,6 +419,8 @@ class _TrackPageState extends State<TrackPage> {
 class TopBarC extends StatelessWidget {
   final String title;
   const TopBarC({super.key, required this.title});
+  static List<String> daysOfTheWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static List<String> monthsOfTheYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
 
   @override
   Widget build(BuildContext context) {
@@ -433,9 +435,9 @@ class TopBarC extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'THURSDAY, 28 SEP',
-                style: TextStyle(
+              Text(
+                '${daysOfTheWeek[DateTime.now().weekday - 1]} ${DateTime.now().day} ${monthsOfTheYear[DateTime.now().month - 1]}',
+                style: const TextStyle(
                   color: Color.fromARGB(255, 149, 255, 0),
                   fontWeight: FontWeight.w600,
                   fontSize: 12,
@@ -453,20 +455,41 @@ class TopBarC extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            width: 30,
-            height: 30,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              // color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              image: DecorationImage(
-                // image: NetworkImage('https://ichef.bbci.co.uk/images/ic/704xn/p02hdy14.jpg'),
-                image: AssetImage('assets/logo_w.png'),
-                fit: BoxFit.cover
-              )
+          PopupMenuButton(
+            color: const Color.fromARGB(255, 22, 22, 22),
+            surfaceTintColor: Colors.transparent,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))
             ),
-          ),
+            child: Container(
+              width: 30,
+              height: 30,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                // color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                image: DecorationImage(
+                  // image: NetworkImage('https://ichef.bbci.co.uk/images/ic/704xn/p02hdy14.jpg'),
+                  image: AssetImage('assets/logo_w.png'),
+                  fit: BoxFit.cover
+                )
+              ),
+            ),
+            itemBuilder: (context) {
+              return const [ PopupMenuItem<int>(
+                  value: 0,
+                  child: Text("My Account"),
+              ),
+              PopupMenuItem<int>(
+                  value: 1,
+                  child: Text("Settings"),
+              ),
+              PopupMenuItem<int>(
+                  value: 2,
+                  child: Text("Logout"),
+              ),];
+            },
+          )
         ],
       ),
     );
@@ -508,7 +531,6 @@ class _ThePieChartState extends State<ThePieChart> {
           ]
       );
     });
-    final ccals  = ValueNotifier<double> (widget.consumedCals);
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: SizedBox(

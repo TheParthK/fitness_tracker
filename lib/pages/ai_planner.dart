@@ -45,6 +45,7 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
     setState(() {
       uploading = true;
     });
+    // var url = 'http://192.168.29.100:8000/api/get-ai-response';
     var url = 'http://127.0.0.1:5000/api/get-ai-response';
     var body = jsonEncode({   
       "user_info":{
@@ -106,7 +107,7 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
             Container(
               color: Colors.black,
               child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                 children: [ 
                   const TopBarC(title: 'AI Planner',),
                   !uploading && !gotResponse?
@@ -115,17 +116,20 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
                       children: [
                         const Padding(
                           padding: EdgeInsets.only(bottom: 12),
-                          child: Text(
-                            'Personal Information',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Personal Information',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold
+                              ),
                             ),
                           ),
                         ),
-                        ...AIPlannerPage.inputNames.map((e) => CustomInputField(title: e, widget: CustomInputFieldChildTextInput(controller: AIPlannerPage.textEditingControllers[AIPlannerPage.inputNames.indexOf(e)],)),),
+                        ...AIPlannerPage.inputNames.map((e) => CustomInputField(title: e, widget: CustomInputFieldChildTextInput(title: e,controller: AIPlannerPage.textEditingControllers[AIPlannerPage.inputNames.indexOf(e)],)),),
                         const SizedBox(height: 10,),
                         CustomButton(text: ' Continue ', function: () => submitResponse()),
                       ],
@@ -138,7 +142,7 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
                           color: Color.fromARGB(255, 30, 30, 30),
                           borderRadius: BorderRadius.all(Radius.circular(20))
                         ),
-                        child: CupertinoActivityIndicator(color: Colors.white,),
+                        child: const CupertinoActivityIndicator(color: Colors.white,),
                       ),
                     ) : Markdown(
                       shrinkWrap: true,
@@ -165,42 +169,34 @@ class CustomInputField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
         width: double.infinity,
         decoration: const BoxDecoration(
         color: Color.fromARGB(255, 22, 22, 22),
         borderRadius: BorderRadius.all(Radius.circular(20))
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:  [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12
-              ),
-            ),
-            widget
-          ],
-        ),
+        child: widget,
       )
     );
   }
 }
 
 class CustomInputFieldChildTextInput extends StatelessWidget {
+  final String title;
   final TextEditingController controller;
-  const CustomInputFieldChildTextInput ({super.key, required this.controller});
+  const CustomInputFieldChildTextInput ({super.key, required this.controller, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 35,
+    return SizedBox(
       child: TextField(
+        maxLines: null,
         decoration: InputDecoration(
           border: InputBorder.none,
+          labelText: title,
+          labelStyle: const TextStyle(
+            color: Colors.grey
+          )
         ),
       ),
     );
@@ -217,7 +213,7 @@ class CustomDropdownInput extends StatelessWidget {
       height: 35,
       width: double.infinity,
       child: DropdownButton(
-        dropdownColor: Color.fromARGB(255, 22, 22, 22),
+        dropdownColor: const Color.fromARGB(255, 22, 22, 22),
         borderRadius: const BorderRadius.all(Radius.circular(20)),
         style: const TextStyle(
           color: Colors.white
