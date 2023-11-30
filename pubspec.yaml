@@ -43,6 +43,11 @@ dependencies:
   simple_animations: ^5.0.2
   http: ^0.13.6
   flutter_markdown: ^0.6.15
+  gap: ^3.0.1
+  collection: ^1.17.0
+  google_sign_in: ^6.1.6
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.15.0
 
 dev_dependencies:
   flutter_test:

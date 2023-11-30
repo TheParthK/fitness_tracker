@@ -26,8 +26,8 @@ class _HomePageState extends State<HomePage> {
   }
   @override
   Widget build(BuildContext context) {
-    EdgeInsets devicePadding = MediaQuery.of(context).padding;
-    Size size = MediaQuery.of(context).size;
+    EdgeInsets devicePadding = MediaQuery.of(context).padding; // to get device padding
+    // Size size = MediaQuery.of(context).size; // to get device screen size
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
@@ -35,13 +35,8 @@ class _HomePageState extends State<HomePage> {
         body: Stack(
           children: [
             currentPage == 0 ? 
-            PageStorage(
-              bucket: PageStorageBucket(),
-              child: const AIPlannerPage()
-              )
-            : PageStorage(
-              bucket: PageStorageBucket(),
-              child: TrackPage()),
+            const AIPlannerPage()
+            : TrackPage(),
             Column(
               children: [
                 ClipRRect(

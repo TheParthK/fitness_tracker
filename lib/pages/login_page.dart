@@ -1,10 +1,18 @@
-import 'dart:ui';
 
-import 'package:fitness_tracker/pages/home.dart';
+import 'package:fitness_tracker/Services/auth_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  bool isSigninPage = true;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +21,7 @@ class LoginPage extends StatelessWidget {
       decoration: const BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
-                'https://images.unsplash.com/photo-1694390786624-f9afc128c669?auto=format&fit=crop&q=80&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                'https://images.unsplash.com/photo-1554139844-af2fc8ad3a3a?q=80&w=2397&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
               ),
               fit: BoxFit.cover
             )
@@ -21,99 +29,88 @@ class LoginPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: Center(
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                boxShadow: [BoxShadow(color: Colors.black.withAlpha(20), blurRadius: 10)]
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
+              child: Stack(
                 children: [
                   Container(
-                    width: 50,
-                    height: 50,
-                    padding: const EdgeInsets.all(13),
+                    padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 25, 25, 25),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderRadius: BorderRadius.all(Radius.circular(40)),
+                      image: DecorationImage(
+                        image: NetworkImage('https://i.giphy.com/media/3otO6NFBIAFg2vPZuM/giphy.webp'),
+                        fit: BoxFit.cover
+                      )
                     ),
-                    child: Image.asset('assets/logo_w.png'),
-                  ),
-                  const SizedBox(height: 10,),
-                  const Text(
-                    'Sign in to your account',
-                    style: TextStyle(
-                      color: Colors.black, 
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
-                  const SizedBox(height: 15,),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration:  BoxDecoration(
-                      // color: const Color.fromARGB(255, 235, 235, 235),
-                      color: Colors.white,
-                      borderRadius: const  BorderRadius.all(Radius.circular(12)),
-                      border: Border.all(width: 0.8, color: Color.fromARGB(255, 200, 200, 200)),
-                      boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10)]
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CustomInputField(hintText: 'Email Address',),
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.symmetric(vertical: 12),
-                          height: 0.8,
-                          color: Color.fromARGB(255, 200, 200, 200),
-                        ),
-                        const CustomInputField(hintText: 'Password',),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10,),
-                  const Text(
-                    'New Here?',
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 100, 100, 100),
-                      fontSize: 12
-                    ),
-                  ),
-                  const SizedBox(height: 5,),
-                  CustomButton(text: 'Sign Up Instead', function: (){},),
-                  const SizedBox(height: 10,),
-                  Row(
-                    children: [
-                      const SizedBox(width: 10,),
-                      Expanded(child: Container(height: 0.8, color: const Color.fromARGB(255, 200, 200, 200))),
-                      const Padding(
-                        padding:  EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          'or',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 100, 100, 100),
-                            fontSize: 12
-                          ),
-                        ),
+                    child: Container(
+                      padding: const EdgeInsets.all(17),
+                      height: 60,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
-                      Expanded(child: Container(height: 0.8, color: const Color.fromARGB(255, 200, 200, 200))),
-                      const SizedBox(width: 10,),
-                    ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Icon(CupertinoIcons.arrow_right, color: Colors.white),
+                          Image.network('https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/logo-google.png'),
+                          const Icon(CupertinoIcons.arrow_right, color: Colors.black)
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 10,),
-                  CustomButton(text: 'Continue', function: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(),)),)
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      splashColor: Colors.black38,
+                      onTap: () {
+                        AuthService().signInWithGoogle();
+                      },
+                      borderRadius: const BorderRadius.all(Radius.circular(40)),
+                      child: Ink(
+                        width: double.infinity,
+                        height: 64,
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
           ),
+          // child: Center(
+          //   child: Container(
+          //     width: double.infinity,
+          //     margin: const EdgeInsets.all(12),
+          //     padding: const EdgeInsets.all(12),
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       borderRadius: const BorderRadius.all(Radius.circular(20)),
+          //       boxShadow: [BoxShadow(color: Colors.black.withAlpha(20), blurRadius: 10)]
+          //     ),
+          //     child: Column(
+          //       mainAxisSize: MainAxisSize.min,
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       crossAxisAlignment: CrossAxisAlignment.center,
+          //       children: [
+          //         Container(
+          //           width: 50,
+          //           height: 50,
+          //           padding: const EdgeInsets.all(13),
+          //           decoration: const BoxDecoration(
+          //             color: Color.fromARGB(255, 25, 25, 25),
+          //             borderRadius: BorderRadius.all(Radius.circular(12)),
+          //           ),
+          //           child: Image.asset('assets/logo_w.png'),
+          //         ),
+          //         const SizedBox(height: 10,),
+                  
+          //       ],
+          //     ),
+          //   ),
+          // ),
         ),
       ),
     );
@@ -146,15 +143,16 @@ class CustomInputField extends StatelessWidget {
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback function;
-  const CustomButton({super.key, required this.text, required this.function});
+  final Color primaryColor;
+  final Color secondaryColor;
+  const CustomButton({super.key, required this.text, required this.function, required this.primaryColor, required this.secondaryColor});
 
   @override
   Widget build(BuildContext context) {
-    // String text = text.toLowerCase() == 'continue' ? 'Continue' : 'Sign up instead';
-    Color textColor = text.toLowerCase() == 'continue' ? Colors.white : Colors.black;
-    Color bgColor = text.toLowerCase() == 'continue' ? Colors.black : const Color.fromARGB(255, 240, 240, 240);
-    Color borderColor = text.toLowerCase() == 'continue' ? Colors.black : Colors.grey.withAlpha(10);
-    Color splashColor = text.toLowerCase() == 'continue' ? Colors.white : Colors.black;
+    Color textColor = secondaryColor;
+    Color bgColor = primaryColor == Colors.white ? const Color.fromARGB(255, 240, 240, 240) : Colors.black;
+    Color borderColor = primaryColor == Colors.white ? Colors.grey.withAlpha(10) : Colors.black;
+    Color splashColor = secondaryColor;
     return Material(
       color: Colors.transparent,
       child: InkWell(

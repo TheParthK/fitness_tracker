@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 class AIPlannerPage extends StatefulWidget {
   const AIPlannerPage({super.key});
 
-  static const List<String> genders = <String>['Male', 'Female', 'Delusional'];
+  // static const List<String> genders = <String>['Male', 'Female', 'Delusional'];
 
   static List<String> inputNames = [
     'Age',
@@ -41,12 +41,13 @@ class AIPlannerPage extends StatefulWidget {
 }
 
 class _AIPlannerPageState extends State<AIPlannerPage> {
+
   Future submitResponse() async{
     setState(() {
       uploading = true;
     });
-    // var url = 'http://192.168.29.100:8000/api/get-ai-response';
-    var url = 'http://127.0.0.1:5000/api/get-ai-response';
+    var url = 'http://192.168.29.100:5000/api/get-ai-response';
+    // var url = 'http://127.0.0.1:5000/api/get-ai-response';
     var body = jsonEncode({   
       "user_info":{
           "age" : AIPlannerPage.textEditingControllers[0].text,
@@ -74,7 +75,7 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
     Uri.parse(url),
     headers: {"Content-Type": "application/json"},
     body: body
-  ).then((value){
+  ).then((value){  
     setState(() {
       gotResponse = true;
       uploading = false;
@@ -131,7 +132,7 @@ class _AIPlannerPageState extends State<AIPlannerPage> {
                         ),
                         ...AIPlannerPage.inputNames.map((e) => CustomInputField(title: e, widget: CustomInputFieldChildTextInput(title: e,controller: AIPlannerPage.textEditingControllers[AIPlannerPage.inputNames.indexOf(e)],)),),
                         const SizedBox(height: 10,),
-                        CustomButton(text: ' Continue ', function: () => submitResponse()),
+                        CustomButton(text: ' Continue ', primaryColor: Colors.white, secondaryColor: Colors.black, function: () => submitResponse()),
                       ],
                     ): uploading && !gotResponse ? 
                     Center(

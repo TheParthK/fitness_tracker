@@ -1,18 +1,18 @@
 import 'package:circular_chart_flutter/circular_chart_flutter.dart';
+import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness_tracker/models/models.dart';
 import 'package:fitness_tracker/widgets/list_item.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:simple_animations/simple_animations.dart';
-import 'package:collection/collection.dart';
+
+import '../Services/services.dart';
 
 class TrackPage extends StatefulWidget {
-  TrackPage({super.key});
-  static Map<String, double> datamap = {
-    'Burnt' : 9,
-    'Left' : 1,
-  };
+  const TrackPage({super.key});
 
   @override
   State<TrackPage> createState() => _TrackPageState();
@@ -21,29 +21,43 @@ class TrackPage extends StatefulWidget {
 class _TrackPageState extends State<TrackPage> {
 // bottom modal sheet
 
-  double totalCals = 4500;
+  void addDeetsTofoodInfo() async{
+    await APIservice()
+      .getUserTrackDetails()
+        .then((value){
+          setState(() {
+            calGoal = double.parse(value['total_cals']);
+            foodInfos = value['list_meals'];
+          });
+        });
 
-  List<CustomListModel> foodInfos = [
-    CustomListModel(item: 'Burrito', cal: 650),
-    CustomListModel(item: 'Omlette', cal: 59),
-    CustomListModel(item: 'Boiled Eggs', cal: 24),
-    CustomListModel(item: 'Noodles', cal: 84),
-    CustomListModel(item: 'Chicken Tikka Masala', cal: 540),
-    CustomListModel(item: 'Carbonated Drink', cal: 115),
-    CustomListModel(item: 'Butter Chicken', cal: 650),
-    CustomListModel(item: 'Omlette', cal: 59),
-    CustomListModel(item: 'Boiled Eggs', cal: 24),
-    CustomListModel(item: 'Noodles', cal: 84),
-    CustomListModel(item: 'Chicken Tikka Masala', cal: 540),
-    CustomListModel(item: 'Carbonated Drink', cal: 115),
+    print(foodInfos.last.item);
+    // foodInfos = await APIservice().getUserTrackDetails()['list_meals'].toList();
+  }
+  @override
+  void initState() {
+    addDeetsTofoodInfo();
+    super.initState();
+  }
+  double calGoal = 0;
+  List<MealDetailsModal> foodInfos = [
+    // MealDetailsModal(item: 'Burrito', calories: 690, carbs: 100, fats: 100, protiens: 200),
   ];
   DateTime selectedDate = DateTime.now();
 
+  _saveUserTrackDetails(){
+    APIservice().saveUserTrackDetails(
+      foodInfos,
+      foodInfos.map((e) => e.calories).toList().sum.toDouble(),
+      calGoal
+    );
+  }
 
-  _addItemToFoodInfos(CustomListModel food){
+  _addItemToFoodInfos(MealDetailsModal food){
     setState(() {
       foodInfos.add(food);
     });
+
     final SnackBar sb = SnackBar(
       content: Text(
         'Added \'${food.item}\' Sucessfully!',
@@ -58,6 +72,8 @@ class _TrackPageState extends State<TrackPage> {
     );
     ScaffoldMessenger.of(context).showSnackBar(sb);
   }
+
+
   _showAddMenu(){
     showModalBottomSheet(
       backgroundColor: Colors.black45,
@@ -67,6 +83,9 @@ class _TrackPageState extends State<TrackPage> {
       builder: (context) {
         TextEditingController mealNameController = TextEditingController();
         TextEditingController calController = TextEditingController();
+        TextEditingController carbsController = TextEditingController();
+        TextEditingController fatsController = TextEditingController();
+        TextEditingController protiensController = TextEditingController();
         return StatefulBuilder(
           builder: (context, setState) => 
             FractionallySizedBox(
@@ -108,12 +127,46 @@ class _TrackPageState extends State<TrackPage> {
                             icon: Icons.check,
                             color: Colors.green,
                             function: (){
+                              if(
+                                mealNameController.text != '' && 
+                                calController.text != '' && 
+                                carbsController.text != '' && 
+                                fatsController.text != '' && 
+                                protiensController.text != ''
+                                ){
                               String mealName = mealNameController.text;
                               int mealCal = int.parse(calController.text);
-                              CustomListModel item = CustomListModel(item: mealName, cal: mealCal);
+                              int mealCarbs= int.parse(carbsController.text);
+                              int mealFats = int.parse(fatsController.text);
+                              int mealProtiens = int.parse(protiensController.text);
+                              MealDetailsModal item 
+                                  = MealDetailsModal(
+                                    item: mealName,
+                                    calories: mealCal, 
+                                    carbs: mealCarbs,
+                                    fats: mealFats,
+                                    protiens: mealProtiens
+                              );
                               _addItemToFoodInfos(item);
+                              _saveUserTrackDetails();
                               print(foodInfos.last.item);
                               Navigator.pop(context);
+                              } else {
+                                    const SnackBar sb1 = SnackBar(
+                                    content: Text(
+                                      'Error: Your Input Feild Can\'t Be Empty',
+                                      style: TextStyle(
+                                        color: Colors.white
+                                      ),
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: Color.fromARGB(255, 35, 35, 35),
+                                    dismissDirection: DismissDirection.vertical,
+                                    elevation: 0,
+                                  );
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(sb1);
+                              }
                             },
                           ),
                         
@@ -129,30 +182,30 @@ class _TrackPageState extends State<TrackPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                              showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2002),
-                              lastDate: DateTime(3000),
-                            ).then(
-                              (pickedTime){
-                                if(pickedTime == null){
-                                  print('not selected time lol');
-                                  return ;
-                                } else {
-                                  setState(() {
-                                    selectedDate = pickedTime;
-                                    print(selectedDate);
-                                  });
-                                }
-                              }
-                            );
-                          },
-                          child: Text('${daysOfTheWeek[selectedDate.weekday - 1]} ${selectedDate.day} ${monthsOfTheYear[selectedDate.month - 1]}')
-                        ),
-                        const SizedBox(width: 10,),
+                        // ElevatedButton(
+                        //   onPressed: () {
+                        //     //   showDatePicker(
+                        //     //   context: context,
+                        //     //   initialDate: DateTime.now(),
+                        //     //   firstDate: DateTime(2002),
+                        //     //   lastDate: DateTime(3000),
+                        //     // ).then(
+                        //     //   (pickedTime){
+                        //     //     if(pickedTime == null){
+                        //     //       print('not selected time lol');
+                        //     //       return ;
+                        //     //     } else {
+                        //     //       setState(() {
+                        //     //         selectedDate = pickedTime;
+                        //     //         print(selectedDate);
+                        //     //       });
+                        //     //     }
+                        //     //   }
+                        //     // );
+                        //   },
+                        //   child: Text('${daysOfTheWeek[selectedDate.weekday - 1]} ${selectedDate.day} ${monthsOfTheYear[selectedDate.month - 1]}')
+                        // ),
+                        // const SizedBox(width: 10,),
                         Expanded(
                           child: Container(
                             height: 40,
@@ -185,53 +238,22 @@ class _TrackPageState extends State<TrackPage> {
                         )
                       ],
                     ),
-                    SizedBox(height: 10,),
+                    const Gap(10),
                     Row(
                       children: [
-                        Container(
-                          height: 40,
-                          width: 120,
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(30)),
-                              color: Color.fromARGB(255, 37, 35, 41)
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  textAlign: TextAlign.center,
-                                  keyboardType: TextInputType.number,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 197, 182, 241),
-                                  ),
-                                  textAlignVertical: TextAlignVertical.top,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(bottom: 12.5),
-                                    hintText: '000'
-                                  ),
-                                  controller: calController,
-                                ),
-                              ),
-                              const SizedBox(width: 7.5,),
-                              Container(
-                                height: 20,
-                                width: 2,
-                                color: Colors.white10,
-                              ),
-                              const SizedBox(width: 7.5,),
-                              const Text(
-                                'Cals'
-                              ),
-                            ],
-                          )
-                        )
+                        AddMealMacroInputWidget(name: 'Cals',textEditingController: calController),
+                        const Gap(10),
+                        AddMealMacroInputWidget(name: 'Carbs',textEditingController: carbsController),
                       ],
-                    )
+                    ),
+                    const Gap(10),
+                    Row(
+                      children: [
+                        AddMealMacroInputWidget(name: 'Fats',textEditingController: fatsController),
+                        const Gap(10),
+                        AddMealMacroInputWidget(name: 'Protiens',textEditingController: protiensController),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -249,164 +271,171 @@ class _TrackPageState extends State<TrackPage> {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
     return Scaffold(
       backgroundColor: Colors.black,
-      body: PlayAnimationBuilder(
-        tween: Tween(begin: 0.01, end: 1),
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastLinearToSlowEaseIn,
-        fps: 60,
-        builder: (context, value, child) => 
-          Opacity(
-            opacity: value.toDouble(),
-            child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(0),
-                children: [
-                  const TopBarC(title: 'Tracking',),
-                  ThePieChart(totalCals: totalCals, consumedCals: foodInfos.map((e) => e.cal).toList().sum.toDouble()),
-                  Container(
-                    width: double.infinity,
-                    height: 70,
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 22, 22, 22),
-                      borderRadius: BorderRadius.all(Radius.circular(20))
-                    ),  
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: const TextSpan(
-                                style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                ),
-                              children: [
-                                TextSpan(text: '325'),
-                                TextSpan(
-                                  text: '\nProtien',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12
-                                    ),
-                                  )
-                                ]
-                              )
-                            ),
-                          ),
-                          Container(
-                            height: double.infinity,
-                            width: .8,
-                            color: Colors.grey,
-                          ),
-                          Expanded(
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: const TextSpan(
-                                style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                ),
-                              children: [
-                                TextSpan(text: '245'),
-                                TextSpan(
-                                  text: '\nCarbs',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12
-                                    ),
-                                  )
-                                ]
-                              )
-                            ),
-                          ),
-                          Container(
-                            height: double.infinity,
-                            width: .8,
-                            color: Colors.grey,
-                          ),
-                          Expanded(
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: const TextSpan(
-                                style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                ),
-                              children: [
-                                TextSpan(text: '503'),
-                                TextSpan(
-                                  text: '\nFibre',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12
+      body: FutureBuilder(
+        future: APIservice().getUserTrackDetails(),
+        builder: (context, snapshot) => 
+        snapshot.hasData ?
+            PlayAnimationBuilder(
+          tween: Tween(begin: 0.01, end: 1),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.fastLinearToSlowEaseIn,
+          fps: 60,
+          builder: (context, value, child) => 
+            Opacity(
+              opacity: value.toDouble(),
+              child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(0),
+                  children: [
+                    const TopBarC(title: 'Tracking',),
+                    ThePieChart(totalCals: calGoal, consumedCals: foodInfos.map((e) => e.calories).toList().sum.toDouble()),
+                    Container(
+                      width: double.infinity,
+                      height: 70,
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 22, 22, 22),
+                        borderRadius: BorderRadius.all(Radius.circular(20))
+                      ),  
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
                                   ),
+                                children: [
+                                  TextSpan(text: foodInfos.map((e) => e.carbs).toList().sum.toString()),
+                                  const TextSpan(
+                                    text: '\nCarbs',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12
+                                      ),
+                                    )
+                                  ]
                                 )
-                              ]
-                            )
+                              ),
+                            ),
+                            Container(
+                              height: double.infinity,
+                              width: .8,
+                              color: Colors.grey,
+                            ),
+                            Expanded(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  ),
+                                children: [
+                                  TextSpan(text: foodInfos.map((e) => e.protiens).toList().sum.toString()),
+                                  const TextSpan(
+                                    text: '\nProtiens',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12
+                                      ),
+                                    )
+                                  ]
+                                )
+                              ),
+                            ),
+                            Container(
+                              height: double.infinity,
+                              width: .8,
+                              color: Colors.grey,
+                            ),
+                            Expanded(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  ),
+                                children: [
+                                  TextSpan(text: foodInfos.map((e) => e.fats).toList().sum.toString()),
+                                  const TextSpan(
+                                    text: '\nFats',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12
+                                    ),
+                                  )
+                                ]
+                              )
+                            ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20,),
+                    SizedBox(
+                      height: 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            ' Meals',
+                            style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            ),
                           ),
-                          ),
+                          InkWell(
+                            onTap: () => _showAddMenu(),
+                            borderRadius: const BorderRadius.all(Radius.circular(16)),
+                            child: Ink(
+                              height: 32,
+                              width: 32,
+                              child: const Center(
+                                child: Icon(
+                                  Icons.add_circle,
+                                  size: 32,
+                                  color: Color.fromARGB(255, 149, 255, 0),
+                                ),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20,),
-                  SizedBox(
-                    height: 40,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          ' Meals',
-                          style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () => _showAddMenu(),
-                          borderRadius: const BorderRadius.all(Radius.circular(16)),
-                          child: Ink(
-                            height: 32,
-                            width: 32,
-                            child: const Center(
-                              child: Icon(
-                                Icons.add_circle,
-                                size: 32,
-                                color: Color.fromARGB(255, 149, 255, 0),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
+                    const SizedBox(height: 10,),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Color.fromARGB(255, 22, 22, 22)
+                      ),
+                      child: 
+                      foodInfos.isNotEmpty ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // ...(snapshot.data!['list_meals']).map((e) => ListItemCustom(mealDetailsModal: e))
+                          ...foodInfos.map((e) => ListItemCustom(mealDetailsModal: e))
+                        ],
+                      ) : const Center(child: Text('No Meals Yet 🙁', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
                     ),
-                  ),
-                  const SizedBox(height: 10,),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Color.fromARGB(255, 22, 22, 22)
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ...foodInfos.map((e) => ListItemCustom(info: e)),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: devicePadding.bottom + 80,)
-                ],
+                    SizedBox(height: devicePadding.bottom + 80,)
+                  ],
+              ),
             ),
           ),
-        ),
+        ) : const Center(child: CupertinoActivityIndicator(),)
       ),
     );
   }
@@ -476,17 +505,19 @@ class TopBarC extends StatelessWidget {
               ),
             ),
             itemBuilder: (context) {
-              return const [ PopupMenuItem<int>(
+              return [ 
+              const PopupMenuItem<int>(
                   value: 0,
                   child: Text("My Account"),
               ),
-              PopupMenuItem<int>(
+              const PopupMenuItem<int>(
                   value: 1,
                   child: Text("Settings"),
               ),
               PopupMenuItem<int>(
+                onTap: () => FirebaseAuth.instance.signOut(),
                   value: 2,
-                  child: Text("Logout"),
+                  child: const Text("Logout"),
               ),];
             },
           )
@@ -503,6 +534,7 @@ class TopBarC extends StatelessWidget {
 
 
 
+// ignore: must_be_immutable
 class ThePieChart extends StatefulWidget {
   final double totalCals;
   final double consumedCals;
@@ -613,7 +645,7 @@ class SubmitCancelButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: function,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
         splashColor: color.withAlpha(100),
         child: Ink(
           padding: const EdgeInsets.all(7.5),
@@ -629,6 +661,59 @@ class SubmitCancelButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class AddMealMacroInputWidget extends StatelessWidget {
+  final String name;
+  final TextEditingController textEditingController;
+  const AddMealMacroInputWidget({super.key,  required this.name, required this.textEditingController,});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      width: 150,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          color: Color.fromARGB(255, 37, 35, 41)
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: TextField(
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 197, 182, 241),
+              ),
+              textAlignVertical: TextAlignVertical.top,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(bottom: 12.5),
+                hintText: '000'
+              ),
+              controller: textEditingController,
+            ),
+          ),
+          const Gap(7.5),
+          Container(
+            height: 20,
+            width: 2,
+            color: Colors.white10,
+          ),
+          const Gap(7.5),
+          Text(
+            name
+          ),
+        ],
+      )
     );
   }
 }

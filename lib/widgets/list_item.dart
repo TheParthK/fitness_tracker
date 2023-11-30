@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 
 class ListItemCustom extends StatelessWidget {
-  final CustomListModel info;
-  const ListItemCustom({super.key, required this.info});
+  final MealDetailsModal mealDetailsModal;
+  const ListItemCustom({super.key, required this.mealDetailsModal});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,7 +19,7 @@ class ListItemCustom extends StatelessWidget {
                 child: Container(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    info.item,
+                    mealDetailsModal.item,
                     style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -28,11 +28,6 @@ class ListItemCustom extends StatelessWidget {
                   ),
                 )
               ),
-              // Container(
-              //   height: 35,
-              //   width: .8,
-              //   color: Colors.grey,
-              //   ),
               Expanded(
                 flex: 1,
                 child: Container(
@@ -46,7 +41,7 @@ class ListItemCustom extends StatelessWidget {
                       fontSize: 20,
                       ),
                     children: [
-                      TextSpan(text: info.cal.toString()),
+                      TextSpan(text: mealDetailsModal.calories.toString()),
                       const TextSpan(
                         text: ' Cal',
                         style: TextStyle(
